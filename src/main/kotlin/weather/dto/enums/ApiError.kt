@@ -1,4 +1,4 @@
-package weather.dto.responses
+package weather.dto.enums
 
 enum class ApiError(val code: Int, val description: String) {
 

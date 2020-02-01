@@ -9,7 +9,7 @@ import weather.dto.base.BaseException
 import weather.dto.bodies.ChangeIntervalBody
 import weather.dto.bodies.ChangeTrackingBody
 import weather.dto.bodies.CityNameBody
-import weather.dto.responses.ApiError
+import weather.dto.enums.ApiError
 import weather.dto.responses.WeatherResponse
 import weather.models.City
 import weather.models.DEFAULT_INTERVAL

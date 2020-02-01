@@ -7,7 +7,7 @@ import weather.dto.Weather
 import weather.dto.base.BaseException
 import weather.dto.bodies.ChangeIntervalBody
 import weather.dto.bodies.ChangeTrackingBody
-import weather.dto.responses.ApiError
+import weather.dto.enums.ApiError
 import weather.dto.responses.WeatherResponse
 import weather.repositories.CityRepository
 import weather.repositories.MockRepository
