@@ -90,8 +90,6 @@ class WeatherServiceImpl : WeatherService {
         city.interval = body.interval
         cityRepository.save(city)
 
-        scheduleWeatherUpdateService.jobsMap[body.getCityName()]?.cancel(false)
-
         addTaskToScheduler(body.getCityName(), body.interval)
 
         return true
