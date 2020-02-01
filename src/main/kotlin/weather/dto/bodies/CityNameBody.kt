@@ -1,3 +1,3 @@
 package weather.dto.bodies
 
-class CityNameBody(val city: String)
+class CityNameBody(override val city: String) : CityNameBodyInterface

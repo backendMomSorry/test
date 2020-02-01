@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 import weather.dto.base.BaseException
 import weather.dto.responses.ApiError
-import weather.dto.responses.BaseResponse
+import weather.dto.base.BaseResponse
 
 abstract class BaseHandler {
 

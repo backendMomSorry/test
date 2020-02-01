@@ -3,7 +3,7 @@ package weather.services.impl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import weather.ScheduleTaskService
+import weather.ScheduleWeatherUpdateService
 import weather.WeatherUpdateThread
 import weather.dto.base.BaseException
 import weather.dto.bodies.ChangeIntervalBody
@@ -30,30 +30,34 @@ class WeatherServiceImpl : WeatherService {
     @Autowired
     lateinit var weatherService: WeatherService
     @Autowired
-    lateinit var scheduleTaskService: ScheduleTaskService
+    lateinit var scheduleWeatherUpdateService: ScheduleWeatherUpdateService
     @Autowired
     lateinit var weatherRepository: WeatherRepository
 
     override fun addCity(body: CityNameBody): Mono<Boolean> {
         cityRepository
-                .findByName(body.city)
+                .findByName(body.getCityName())
                 ?.let {
                     throw BaseException(ApiError.CITY_ALREADY_ADDED)
                 }
 
         return weatherWebClientService
-                .getWeather(body.city)
+                .getWeather(body.getCityName())
                 .map {
-                    weatherService.saveCityWithWeather(body.city, it)
+                    weatherService.saveCityWithWeather(body.getCityName(), it)
 
-                    scheduleTaskService.addTaskToScheduler(
-                            city = body.city,
-                            task = WeatherUpdateThread(body.city, cityRepository, weatherWebClientService, weatherRepository),
-                            delay = DEFAULT_INTERVAL
-                    )
+                    addTaskToScheduler(body.getCityName())
 
                     true
                 }
+    }
+
+    private fun addTaskToScheduler(city: String, interval: Long = DEFAULT_INTERVAL) {
+        scheduleWeatherUpdateService.addTaskToScheduler(
+                city = city,
+                task = WeatherUpdateThread(city, cityRepository, weatherWebClientService, weatherRepository),
+                delay = interval
+        )
     }
 
     @Transactional
@@ -75,41 +79,33 @@ class WeatherServiceImpl : WeatherService {
 
     @Transactional
     override fun removeCity(body: CityNameBody): Boolean {
-        scheduleTaskService.removeTaskFromScheduler(body.city)
+        scheduleWeatherUpdateService.removeTaskFromScheduler(body.getCityName())
 
-        return cityRepository.deleteByName(body.city) != 0
+        return cityRepository.deleteByName(body.getCityName()) != 0
     }
 
     @Transactional
     override fun changeInterval(body: ChangeIntervalBody): Boolean {
-        val city = cityRepository.findByName(body.city) ?: throw BaseException(ApiError.CITY_NOT_FOUND)
+        val city = cityRepository.findByName(body.getCityName()) ?: throw BaseException(ApiError.CITY_NOT_FOUND)
         city.interval = body.interval
         cityRepository.save(city)
 
-        scheduleTaskService.jobsMap[body.city]?.cancel(false)
+        scheduleWeatherUpdateService.jobsMap[body.getCityName()]?.cancel(false)
 
-        scheduleTaskService.addTaskToScheduler(
-                city = body.city,
-                task = WeatherUpdateThread(body.city, cityRepository, weatherWebClientService, weatherRepository),
-                delay = body.interval
-        )
+        addTaskToScheduler(body.getCityName(), body.interval)
 
         return true
     }
 
     @Transactional
     override fun changeTracking(body: ChangeTrackingBody): Boolean {
-        val city = cityRepository.findByName(body.city) ?: throw BaseException(ApiError.CITY_NOT_FOUND)
+        val city = cityRepository.findByName(body.getCityName()) ?: throw BaseException(ApiError.CITY_NOT_FOUND)
         city.tracking = body.tracking
         cityRepository.save(city)
 
         when (body.tracking) {
-            true -> scheduleTaskService.addTaskToScheduler(
-                    city = city.name,
-                    task = WeatherUpdateThread(body.city, cityRepository, weatherWebClientService, weatherRepository),
-                    delay = city.interval
-            )
-            else -> scheduleTaskService.removeTaskFromScheduler(city.name)
+            true -> addTaskToScheduler(city.name, city.interval)
+            else -> scheduleWeatherUpdateService.removeTaskFromScheduler(city.name)
         }
 
         return true

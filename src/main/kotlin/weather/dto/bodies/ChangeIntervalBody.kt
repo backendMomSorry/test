@@ -1,3 +1,3 @@
 package weather.dto.bodies
 
-class ChangeIntervalBody(val interval: Long, val city: String)
+class ChangeIntervalBody(val interval: Long, override val city: String) : CityNameBodyInterface
