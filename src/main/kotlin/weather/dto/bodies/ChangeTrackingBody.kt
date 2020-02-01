@@ -1,3 +1,3 @@
 package weather.dto.bodies
 
-class ChangeTrackingBody(val city: String, val tracking: Boolean)
+class ChangeTrackingBody(override val city: String, val tracking: Boolean): CityNameBodyInterface

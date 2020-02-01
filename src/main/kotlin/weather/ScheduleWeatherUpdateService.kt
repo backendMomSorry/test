@@ -8,12 +8,12 @@ import java.util.HashMap
 import java.util.concurrent.ScheduledFuture
 
 @Service
-class ScheduleTaskService(var scheduler: TaskScheduler) {
+class ScheduleWeatherUpdateService(var scheduler: TaskScheduler) {
 
     var jobsMap: MutableMap<String, ScheduledFuture<*>?> = HashMap()
 
     fun addTaskToScheduler(city: String, task: Runnable, delay: Long) {
-        val scheduledTask= scheduler.scheduleAtFixedRate(task, delay)
+        val scheduledTask= scheduler.scheduleWithFixedDelay(task, delay)
         jobsMap[city] = scheduledTask
     }
 

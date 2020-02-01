@@ -16,7 +16,7 @@ class InitializeWeatherUpdate : ApplicationListener<ApplicationReadyEvent> {
     @Autowired
     lateinit var cityRepository: CityRepository
     @Autowired
-    lateinit var scheduleTaskService: ScheduleTaskService
+    lateinit var scheduleTaskService: ScheduleWeatherUpdateService
     @Autowired
     lateinit var weatherRepository: WeatherRepository
 

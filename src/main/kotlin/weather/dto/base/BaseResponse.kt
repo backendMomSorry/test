@@ -1,6 +1,6 @@
-package weather.dto.responses
+package weather.dto.base
 
-import weather.dto.base.BaseException
+import weather.dto.enums.ApiError
 
 class BaseResponse<T>(
         val result: T?,
