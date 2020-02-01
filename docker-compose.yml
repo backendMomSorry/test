@@ -1,0 +1,9 @@
+postgresdb:
+  image: postgres:10.0
+  restart: always
+  ports:
+    - "5432:5432"
+  environment:
+    - POSTGRES_DB=bspb_temp
+    - POSTGRES_PASSWORD=root
+    - POSTGRES_USER=db_admin
